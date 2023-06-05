@@ -9,4 +9,4 @@ def read_bot_token():
             token = f.read().strip()
         return token
     else:
-        return None
+        return ''

@@ -10,4 +10,4 @@ def read_user_token1(userid):
             token = f.read().strip()
         return token
     else:
-        return None
+        return ''
