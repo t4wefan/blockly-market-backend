@@ -1,45 +1,47 @@
-
+import datetime
+import os.path
 from fastapi import FastAPI
-from pydantic import BaseModel
-from upload import Item_upload
-from typing import Union
-from check_user_token import check_user_token
-from generate_token import generate_token
-from check_user import check_user
-from upload import upload
+from upload import ItemUpload, plugin_uploader
 import uvicorn
+from json import load as js_load
 
-# lets start
 app = FastAPI()
 
-class Item_create(BaseModel):
-    token_id: int
-    source: Union[bool, None] = None
-class Item_check(BaseModel):
-    token_id: int
-    token: str
-@app.post('/token/create')
-def generate_token_api(item:Item_create):
-    token_id = item.token_id
-    source = item.source
-    if_user_exists = check_user(userid=token_id)
-    if if_user_exists == True:
-        status = 'error'
-        info = 'user already exists'
-        token = ''
-        return {"info": info, "status": status, "token": token, }
-    else:
-        return generate_token(token_id, source, )
+plugin_index: list
+index_path = os.path.join('data', 'index.json')
+with open(index_path, 'r', encoding='utf-8') as f:
+    plugin_index = js_load(f)
 
-@app.post('/token/check')
-def check_token_api(item:Item_check):
-    token_id = item.token_id
-    token = item.token
-    return check_user_token(token_id=token_id, token_content=token)
+plugin_data: dict
+filepath = os.path.join('data', 'plugin_data.json')
+with open(filepath, 'r', encoding='utf-8') as f:
+    plugin_data = js_load(f)
+
 
 @app.post('/upload')
-def upload(item:Item_upload):
-    return upload(item)
+def upload_(item: ItemUpload):
+    global plugin_index, plugin_data
+    res = plugin_uploader(item)
+    plugin_index = res["index"]
+    plugin_data = res["data"]
+    return res["result"]
+
+
+@app.get("/index")
+def get_index():
+    global plugin_index
+    return {"time": str(datetime.datetime.now()), "index": plugin_index}
+
+
+@app.get("/version/{name}")
+def get_index(name: str):
+    global plugin_data
+    return plugin_data[name]["versions"]
+
+@app.get("/usage")
+async def usage():
+    return '欢迎使用blockly-registry, 在这里可以分享blockly插件, 项目仅供学习交流使用，严禁用于任何商业用途和非法行为,'
+
 
 if __name__ == '__main__':
-    uvicorn.run(app,host='0.0.0.0', port=7860)
+    uvicorn.run(app, host='0.0.0.0', port=7860)
