@@ -33,9 +33,11 @@ def get_index():
     return {"time": str(datetime.datetime.now()), "index": plugin_index}
 
 
-@app.get("/version/{name}")
+@app.get("/versions/{name}")
 def get_index(name: str):
     global plugin_data
+    print(plugin_data)
+    print(plugin_data[name]["versions"])
     return plugin_data[name]["versions"]
 
 @app.get("/usage")

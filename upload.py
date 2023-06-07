@@ -28,6 +28,7 @@ with open(filepath, 'r', encoding='utf-8') as f:
 
 
 def plugin_uploader(item: ItemUpload):
+    global plugin_index, plugin_data
     # status = check_auth(token_id=item.token_id, token_content=item.token)
     # if status.status != 'ok':
     #     return {"result": status, "index": plugin_index, "data": plugin_data}
@@ -44,8 +45,10 @@ def plugin_uploader(item: ItemUpload):
             return {"result": {"status": 'error', "info": 'version error!'}, "index": plugin_index, "data": plugin_data}
 
         plugin_data[item.name]['versions'].append(item.version)
-        for i in range(len(plugin_index) - 1):
-            if plugin_index[i]['name'] == item.name:
+
+        for i in range(len(plugin_index)):
+            if plugin_index[i]['name'] == str(item.name):
+                print('111111111111111111111111')
                 plugin_index[i] = {
                     "name": item.name,
                     "version": item.version,
