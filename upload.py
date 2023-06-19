@@ -48,7 +48,6 @@ def plugin_uploader(item: ItemUpload):
 
         for i in range(len(plugin_index)):
             if plugin_index[i]['name'] == str(item.name):
-                print('111111111111111111111111')
                 plugin_index[i] = {
                     "name": item.name,
                     "version": item.version,
@@ -71,7 +70,8 @@ def plugin_uploader(item: ItemUpload):
     if not os.path.exists(code_path):
         os.makedirs(code_path)
     try:
-        with open(f'{code_path}\\{item.version}.json', 'w') as f:
+        jsonfile_path = os.path.join(code_path,f'{item.version}.json')
+        with open(jsonfile_path, 'w') as f:
             js_dump({
                 "name": item.name,
                 "desc": item.desc,
